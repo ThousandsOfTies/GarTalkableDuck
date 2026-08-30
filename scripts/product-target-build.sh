@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-# Compatibility entrypoint for GaplessAgentRuntime.
+# Fixed MicroDuck target entrypoint; this repository has no target selector.
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-exec "${repo_root}/scripts/package-target.sh" "$@"
+if [[ -n "${GAR_TARGET:-}" && "$GAR_TARGET" != microduck ]]; then
+  echo "GarTalkableDuck has fixed target microduck, not $GAR_TARGET" >&2
+  exit 2
+fi
+export GAR_TARGET=microduck
+export GAR_TARGET_ARTIFACT_MANIFEST="${repo_root}/config/artifact.json"
+exec "${repo_root}/scripts/target/package.sh" "$@"

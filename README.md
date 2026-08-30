@@ -1,22 +1,18 @@
-# gar-build-env
+# GarTalkableDuck
 
-Gapless Agent Runtime 用の Codespaces/devcontainer ビルド環境です。
-
-このリポジトリは Codespaces/devcontainer の共通実行基盤です。
-
-`main` は共通 devspace runtime だけを持ちます。製品ごとの設定は
-`gar-build-env` の製品ブランチに保存します。製品ブランチは
-`config/product.env`、任意の `scripts/product-*.sh`、必要なら
-`sources/*` submodule を持ちます。
+`gar-talkable-duck` applicationと `microduck` 物理targetを固定した独立Product
+repositoryです。Codespaces/devcontainer設定、Product固有hardware、build hook、
+固定artifact契約を同じrepositoryで管理します。別の物理targetは別Product
+repositoryとして作成します。
 
 ## Layout
 
 ```text
-gar-build-env/
+GarTalkableDuck/
   .devcontainer/
   config/
     common.env
-    artifact-manifest.example.json
+    artifact.json
     product.env.example
   Makefile
   scripts/
@@ -24,7 +20,7 @@ gar-build-env/
     setup-common.sh
     setup-product-branch.sh
     product-sim-build.sh.example
-    product-target-build.sh.example
+    product-target-build.sh
   artifacts/             # generated output, ignored
 ```
 
@@ -105,7 +101,7 @@ git add -A
 git commit -m "Update product repo"
 git push
 
-cd path/to/gar-build-env
+cd path/to/GarTalkableDuck
 git add path/to/submodule
 git commit -m "Update product submodule pointer"
 git push
@@ -113,7 +109,7 @@ git push
 
 ## Product Build Hooks
 
-`main` は製品固有のビルド手順を持ちません。製品ブランチで必要に応じて
+Product固有のビルド手順はこのrepositoryのhookとして管理します。必要に応じて
 次の hook を追加します。
 
 ```text
@@ -125,21 +121,18 @@ scripts/product-clean.sh
 
 `make build` は `scripts/product-build.sh` があれば実行します。
 `make artifacts` は `scripts/product-artifacts.sh` があれば実行します。
-Artifact manifest は製品固有の定義です。必要な製品ブランチで
-`config/artifact-manifest.example.json` を参考に、製品用の設定ファイルや
-`scripts/product-artifacts.sh` を追加してください。
+固定Targetのartifact契約は`config/artifact.json`で管理します。
 
 PlatformIO は Python 仮想環境 `~/.venvs/platformio` にインストールされ、
 `~/.bashrc` に PATH が追加されます。
 
-## Application / Deployment / Target Capsule
+## Fixed application / target
 
-Application契約は`sources/gar-talkable-duck/app.json`、MicroDuckとの組み合わせは
-`config/deployments/microduck.json`、将来の実機package実装は
-`scripts/targets/microduck/`が所有します。現在のprofileは`planned`であり、
+Application契約は`sources/gar-talkable-duck/app.json`、固定artifact契約は
+`config/artifact.json`、将来の実機package実装は`scripts/target/`が所有します。
+現在のtargetはplannedであり、
 実装が追加されるまで実機packageは明示的に失敗します。
 
 ```bash
-make check-deployment
-scripts/product-target-build.sh --describe
+make check-target
 ```
