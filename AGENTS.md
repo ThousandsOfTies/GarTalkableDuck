@@ -12,3 +12,12 @@ repository when the same application needs a different physical target.
 Keep reusable board support in `sources/gar-tools`. Commit and push child
 repository changes before updating parent submodule pointers. Generated
 artifacts are not committed.
+
+## Web simulator
+
+For any GAR App simulator, read `sources/gar-tools/AGENTS.md`
+before editing the panel. If the pinned copy lacks it, consult the latest
+gar-tools guide; update the pin when using newer shared components. Build
+reusable device UI and interactions as shared Web
+Components in `sources/gar-tools/web-simulator/components/`; keep Product
+mapping, bridge protocol, and commands in the Product adapter.
